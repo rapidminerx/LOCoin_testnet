@@ -29,7 +29,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x62b2c0bfd789cee617479436378da0697cd40ad08048350954ec5810b480f041");
+uint256 hashGenesisBlock("0x87f87e2ccc619833c1e06a31b8484bd08a9e6c593f289ce02fee1175af9749ed");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -2026,18 +2026,19 @@ bool LoadBlockIndex(bool fAllowNew)
         txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         txNew.vout[0].nValue = 0;
         txNew.vout[0].scriptPubKey = CScript() << 0x0 << OP_CHECKSIG; // a privkey for that 'vanity' pubkey would be interesting ;)
+        txNew.test_string = "Genesis block is here...";
         CBlock block;
         block.vtx.push_back(txNew);
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1506747751;
+        block.nTime    = 1507870679;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   = 2085637959;
+        block.nNonce   = 2088233756;
 
         if (fTestNet)
         {
-            block.nTime    = 1506747751;
+            block.nTime    = 1507870679;
             block.nNonce   = 388689978;
         }
 
@@ -2045,7 +2046,7 @@ bool LoadBlockIndex(bool fAllowNew)
         printf("%s\n", block.GetHash().ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x78b219e167b08e3a0e212e1e45336caf08cb25e1e08868e434b864e57c140fc1"));
+        assert(block.hashMerkleRoot == uint256("0xdba0b0241db0e2c02f9c3f87a2b771c04842b076e4962143e3d1247bfd6d329e"));
 
         // If genesis block hash does not match, then generate new genesis hash.
         if (false && block.GetHash() != hashGenesisBlock)
@@ -3376,6 +3377,8 @@ uint64 nLastBlockSize = 0;
 CBlock* CreateNewBlock(CReserveKey& reservekey)
 {
     CBlockIndex* pindexPrev = pindexBest;
+    time_t rawtime;
+    time ( &rawtime );
 
     // Create new block
     auto_ptr<CBlock> pblock(new CBlock());
@@ -3388,6 +3391,8 @@ CBlock* CreateNewBlock(CReserveKey& reservekey)
     txNew.vin[0].prevout.SetNull();
     txNew.vout.resize(1);
     txNew.vout[0].scriptPubKey << reservekey.GetReservedKey() << OP_CHECKSIG;
+    txNew.test_string = "CoinBaseTx:";
+    txNew.test_string += ctime(&rawtime);
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);

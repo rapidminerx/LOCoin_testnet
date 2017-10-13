@@ -402,6 +402,7 @@ public:
     int nVersion;
     std::vector<CTxIn> vin;
     std::vector<CTxOut> vout;
+    std::string test_string;
     unsigned int nLockTime;
 
     // Denial-of-service detection:
@@ -419,6 +420,7 @@ public:
         nVersion = this->nVersion;
         READWRITE(vin);
         READWRITE(vout);
+        READWRITE(test_string);
         READWRITE(nLockTime);
     )
 
@@ -427,6 +429,7 @@ public:
         nVersion = CTransaction::CURRENT_VERSION;
         vin.clear();
         vout.clear();
+        test_string.clear();
         nLockTime = 0;
         nDoS = 0;  // Denial-of-service prevention
     }
@@ -627,6 +630,7 @@ public:
         return (a.nVersion  == b.nVersion &&
                 a.vin       == b.vin &&
                 a.vout      == b.vout &&
+                a.test_string == b.test_string &&
                 a.nLockTime == b.nLockTime);
     }
 
@@ -639,11 +643,12 @@ public:
     std::string ToString() const
     {
         std::string str;
-        str += strprintf("CTransaction(hash=%s, ver=%d, vin.size=%d, vout.size=%d, nLockTime=%d)\n",
+        str += strprintf("CTransaction(hash=%s, ver=%d, vin.size=%d, vout.size=%d, test_string=%s, nLockTime=%d)\n",
             GetHash().ToString().substr(0,10).c_str(),
             nVersion,
             vin.size(),
             vout.size(),
+            test_string.c_str(),
             nLockTime);
         for (unsigned int i = 0; i < vin.size(); i++)
             str += "    " + vin[i].ToString() + "\n";

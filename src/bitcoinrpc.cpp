@@ -639,11 +639,16 @@ Value setmininput(const Array& params, bool fHelp)
     return true;
 }
 
+#include <time.h>
+
 Value sendtoaddress(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() < 2 || params.size() > 4)
+    time_t rawtime;
+    time ( &rawtime );
+
+    if (fHelp || params.size() < 2 || params.size() > 5)
         throw runtime_error(
-            "sendtoaddress <locoin address> <amount> [comment] [comment-to]\n"
+            "sendtoaddress <locoin address> <amount> [test string] [comment] [comment-to]\n"
             "<amount> is a real and is rounded to the nearest 0.00000001"
             + HelpRequiringPassphrase());
 
@@ -656,10 +661,21 @@ Value sendtoaddress(const Array& params, bool fHelp)
 
     // Wallet comments
     CWalletTx wtx;
+
+    wtx.test_string = "SendTx:";
+    wtx.test_string += ctime(&rawtime);
+    wtx.test_string += ":";
+
     if (params.size() > 2 && params[2].type() != null_type && !params[2].get_str().empty())
-        wtx.mapValue["comment"] = params[2].get_str();
+    {
+        wtx.test_string += params[2].get_str();
+    }
+    printf("sendtoaddress: wtx.test_string= %s", wtx.test_string.c_str());
+
     if (params.size() > 3 && params[3].type() != null_type && !params[3].get_str().empty())
-        wtx.mapValue["to"]      = params[3].get_str();
+        wtx.mapValue["comment"] = params[3].get_str();
+    if (params.size() > 4 && params[4].type() != null_type && !params[4].get_str().empty())
+        wtx.mapValue["to"]      = params[4].get_str();
 
     if (pwalletMain->IsLocked())
         throw JSONRPCError(-13, "Error: Please enter the wallet passphrase with walletpassphrase first.");
@@ -1570,6 +1586,8 @@ Value gettransaction(const Array& params, bool fHelp)
     entry.push_back(Pair("amount", ValueFromAmount(nNet - nFee)));
     if (wtx.IsFromMe())
         entry.push_back(Pair("fee", ValueFromAmount(nFee)));
+
+    entry.push_back(Pair("test_string", wtx.test_string));
 
     WalletTxToJSON(wtx, entry);
 
