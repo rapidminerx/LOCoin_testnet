@@ -2,8 +2,8 @@ Building LoCoin
 
 See doc/readme-qt.rst for instructions on building locoin-qt,
 the intended-for-end-users, nice-graphical-interface, reference
-implementation of LoCoin.
+implementation of tocoin.
 
 See doc/build-*.txt for instructions on building LoCoin,
 the intended-for-services, no-graphical-interface, reference
-implementation of LoCoin.
+implementation of toCoin.
